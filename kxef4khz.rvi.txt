@@ -1,0 +1,47 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+#
+# Initial commit
+#
+# Changes to be committed:
+#	new file:   build.xml
+#	new file:   build/built-jar.properties
+#	new file:   build/classes/cascadeeffectsimulation/Angle.class
+#	new file:   build/classes/cascadeeffectsimulation/Bot$1Scanner.class
+#	new file:   build/classes/cascadeeffectsimulation/Bot.class
+#	new file:   build/classes/cascadeeffectsimulation/CascadeEffectSimulation$1.class
+#	new file:   build/classes/cascadeeffectsimulation/CascadeEffectSimulation$2.class
+#	new file:   build/classes/cascadeeffectsimulation/CascadeEffectSimulation$paintTiming.class
+#	new file:   build/classes/cascadeeffectsimulation/CascadeEffectSimulation$runTiming.class
+#	new file:   build/classes/cascadeeffectsimulation/CascadeEffectSimulation.class
+#	new file:   build/classes/cascadeeffectsimulation/Field.class
+#	new file:   build/classes/cascadeeffectsimulation/FieldObject.class
+#	new file:   build/classes/cascadeeffectsimulation/IRScanner$updateReading.class
+#	new file:   build/classes/cascadeeffectsimulation/IRScanner.class
+#	new file:   build/classes/cascadeeffectsimulation/Point.class
+#	new file:   build/classes/cascadeeffectsimulation/Polygon.class
+#	new file:   build/classes/cascadeeffectsimulation/ScannerReading.class
+#	new file:   build/classes/cascadeeffectsimulation/Vector.class
+#	new file:   dist/CascadeEffectSimulation.jar
+#	new file:   dist/README.TXT
+#	new file:   manifest.mf
+#	new file:   nbproject/build-impl.xml
+#	new file:   nbproject/genfiles.properties
+#	new file:   nbproject/private/private.properties
+#	new file:   nbproject/private/private.xml
+#	new file:   nbproject/project.properties
+#	new file:   nbproject/project.xml
+#	new file:   src/cascadeeffectsimulation/Angle.java
+#	new file:   src/cascadeeffectsimulation/Bot.java
+#	new file:   src/cascadeeffectsimulation/CascadeEffectSimulation.java
+#	new file:   src/cascadeeffectsimulation/Field.java
+#	new file:   src/cascadeeffectsimulation/FieldObject.java
+#	new file:   src/cascadeeffectsimulation/IRScanner.java
+#	new file:   src/cascadeeffectsimulation/Point.java
+#	new file:   src/cascadeeffectsimulation/Polygon.java
+#	new file:   src/cascadeeffectsimulation/ScannerReading.java
+#	new file:   src/cascadeeffectsimulation/Vector.java
+#
+

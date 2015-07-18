@@ -9,18 +9,23 @@ import java.util.ArrayList;
  */
 public class ScannerReading {
     
+    
+    public IRScanner scanner;
+    
     public Point relativeCenter;
     private Point actualCenter;
     private ArrayList<Vector> reading = new ArrayList<>();
     
-    public ScannerReading(Point relativeCenter, Point actualCenter) {
+    public ScannerReading(Point relativeCenter, Point actualCenter, IRScanner scanner) {
         this.relativeCenter = relativeCenter;
         this.actualCenter = actualCenter;
+        this.scanner = scanner;
     }
     
-    public ScannerReading(Point relativeCenter, Point actualCenter, ArrayList<Vector> reading) {
+    public ScannerReading(Point relativeCenter, Point actualCenter, IRScanner scanner, ArrayList<Vector> reading) {
         this.relativeCenter = relativeCenter;
         this.actualCenter = actualCenter;
+        this.scanner = scanner;
         this.reading = reading;
     }
     
@@ -42,12 +47,12 @@ public class ScannerReading {
     
     @Override
     public ScannerReading clone() {
-        return new ScannerReading(relativeCenter, actualCenter, reading);
+        return new ScannerReading(relativeCenter, actualCenter, scanner, reading);
     }
     
     public void draw(Graphics g) {
         for(Vector v : reading) {
-            v.endPoint(actualCenter).draw(g, 10);
+            v.rotate(scanner.bot.startAngle).endPoint(actualCenter).draw(g, 10);
         }
     }
     

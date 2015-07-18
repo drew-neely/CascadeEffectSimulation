@@ -11,7 +11,7 @@ import java.util.TimerTask;
  */
 public class IRScanner {
 
-    private Bot bot;
+    public Bot bot;
     private Point relativePos;
     private Angle relativeAngle;
     private Angle[] relativeAngleRange;
@@ -52,15 +52,17 @@ public class IRScanner {
             readingVector = readingVector.reduceMagnitude(Field.pixelsPerFoot / 12);
             vectorShortened = true;
         }
+        
         if(scannerReading != null && vectorShortened) {
-            scannerReading.add(readingVector);
+            Vector relativeReadingVector = new Vector(readingVector.magnitude(), relativeAngle.add(bot.getRelativeAngle()));
+            scannerReading.add(relativeReadingVector);
         }
         reading = readingVector.magnitude();
     }
     
     public ScannerReading scan() {
         turnTo(relativeAngleRange[0]);
-        scannerReading = new ScannerReading(relativePos, getActualPos());
+        scannerReading = new ScannerReading(relativePos, getActualPos(), this);
         turnTo(relativeAngleRange[1]);
         ScannerReading output = scannerReading.clone();
         scannerReading = null;

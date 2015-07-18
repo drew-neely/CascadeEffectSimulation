@@ -196,6 +196,10 @@ public class Bot extends FieldObject implements Runnable {
         return angle;
     }
 
+    public Angle getRelativeAngle() {
+        return relativeAngle;
+    }
+    
     public Field getField() {
         return field;
     }
