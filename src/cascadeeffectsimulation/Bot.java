@@ -11,7 +11,7 @@ import java.util.TimerTask;
  * @author Drew
  */
 public class Bot extends FieldObject implements Runnable {
-    
+
     /*
      * In order to make this simulation realistic, it is important
      * not to use the actual coordinates of the bot on the screen.
@@ -20,7 +20,6 @@ public class Bot extends FieldObject implements Runnable {
      * The real coordinates are part of the FieldObject class, not the bot class
      * and are used only for rendering.
      */
-    
     private Field field;
     public static double size = Field.pixelsPerFoot * 1.5;
     private Color color;
@@ -40,18 +39,18 @@ public class Bot extends FieldObject implements Runnable {
         this.startPos = this.getCenter();
         scanners[0] = new IRScanner(this, new Point(20, 20), new Angle[]{new Angle(-120), new Angle(60)});
         scanners[1] = new IRScanner(this, new Point(size - 20, 20), new Angle[]{new Angle(-60), new Angle(120)});
+        scanners[0].startScan();
+        scanners[1].startScan();
     }
 
     @Override
     public void run() {
         moveFor(3, 3);
-        scan();
         turnFor(new Angle(90), 45);
         moveFor(3, 3);
         turnFor(new Angle(-90), 45);
         moveFor(1.5, 3);
         turnFor(new Angle(-90), 45);
-        scan();
         System.out.println("Simulation Complete");
     }
 
@@ -66,6 +65,7 @@ public class Bot extends FieldObject implements Runnable {
             //int mult = (angle.getDegrees() > 180 || angle.getDegrees() < 0)? -1 : 1;
             Angle turnAng = new Angle(dirSign * (degPerSecond * seconds) - angle.subtract(toTravel).getDegrees());
             rotate(turnAng);
+            relativeAngle = relativeAngle.add(turnAng);
             toTravel = toTravel.subtract(turnAng);
             this.angle = this.angle.add(turnAng);
             try {
@@ -73,7 +73,7 @@ public class Bot extends FieldObject implements Runnable {
             } catch (InterruptedException ex) {
             }
         }
-        relativeAngle = relativeAngle.add(angle);
+        
         // <editor-fold defaultstate="collapsed" desc="Multi-threaded turning - Doesn't stop execution">
 //        if (turnDist.getDegrees() == 0) {
 //            turnComplete = true;
@@ -108,59 +108,66 @@ public class Bot extends FieldObject implements Runnable {
             long currentTime = (new Date()).getTime();
             double seconds = (double) (currentTime - startTime) / 1000;
             double moveDist = feetPerSecond * Field.pixelsPerFoot * seconds - distTraveled;
-            translate(new Vector(moveDist, angle));
+            Vector disp = new Vector(moveDist, angle);
+            Vector relativeDisp = new Vector(moveDist, relativeAngle);
+            translate(disp);
+            relativePos.translate(relativeDisp);
             distTraveled += moveDist;
             try {
                 Thread.sleep(12l);
             } catch (InterruptedException ex) {
             }
         }
-        double dx = feet * relativeAngle.cos();
-        double dy = feet * relativeAngle.sin();
-        relativePos.translate(dx, dy);
     }
 
-    public ScannerReading[] scan() {
-
-        class Scanner implements Runnable {
-
-            private IRScanner scanner;
-            public ScannerReading result;
-            public boolean isDone = false;
-
-            public Scanner(IRScanner scanner) {
-                this.scanner = scanner;
-            }
-
-            public void scan() {
-                Thread thread = new Thread(this);
-                thread.start();
-            }
-
-            @Override
-            public void run() {
-                result = scanner.scan();
-                isDone = true;
-            }
-        }
-
-        Scanner scanner0 = new Scanner(scanners[0]);
-        Scanner scanner1 = new Scanner(scanners[1]);
-        scanner0.scan();
-        scanner1.scan();
-        while (!scanner0.isDone || !scanner1.isDone) {
-            try {
-                Thread.sleep(12l);
-            } catch (Exception e) {
-            }
-        }
-        System.out.println();
-        ScannerReading[] result = new ScannerReading[]{scanner0.result, scanner1.result};
-        readings.add(result[0]);
-        readings.add(result[1]);
-        return result;
+    public void addReading(ScannerReading scannerReading) {
+        this.readings.add(scannerReading);
     }
 
+    // <editor-fold defaultstate="collapsed" desc="Old scan function. Stops Execution. Returns centered result of old ScannerReading">
+    /*
+     public ScannerReading[] scan() {
+
+     class Scanner implements Runnable {
+
+     private IRScanner scanner;
+     public ScannerReading result;
+     public boolean isDone = false;
+
+     public Scanner(IRScanner scanner) {
+     this.scanner = scanner;
+     }
+
+     public void scan() {
+     Thread thread = new Thread(this);
+     thread.start();
+     }
+
+     @Override
+     public void run() {
+     result = scanner.scan();
+     isDone = true;
+     }
+     }
+
+     Scanner scanner0 = new Scanner(scanners[0]);
+     Scanner scanner1 = new Scanner(scanners[1]);
+     scanner0.scan();
+     scanner1.scan();
+     while (!scanner0.isDone || !scanner1.isDone) {
+     try {
+     Thread.sleep(12l);
+     } catch (Exception e) {
+     }
+     }
+     System.out.println();
+     ScannerReading[] result = new ScannerReading[]{scanner0.result, scanner1.result};
+     readings.add(result[0]);
+     readings.add(result[1]);
+     return result;
+     }
+     */
+    // </editor-fold>
     private static Polygon makePoly(Color color, int pos) {
         double hsize = size / 2;
         double[] xpoints = {-hsize, -hsize, hsize, hsize};
@@ -199,7 +206,7 @@ public class Bot extends FieldObject implements Runnable {
     public Angle getRelativeAngle() {
         return relativeAngle;
     }
-    
+
     public Field getField() {
         return field;
     }
@@ -211,6 +218,15 @@ public class Bot extends FieldObject implements Runnable {
         double x = center.x + theta.cos() * hypot;
         double y = center.y + theta.sin() * hypot;
 
+        return new Point(x, y);
+    }
+    
+    public Point getRelativeFrontLeft() {
+        double hypot = (size / 2) * Math.sqrt(2);
+        Angle theta = relativeAngle.add(-45);
+        double x = relativePos.x + theta.cos() * hypot;
+        double y = relativePos.y + theta.sin() * hypot;
+        
         return new Point(x, y);
     }
 
@@ -226,7 +242,7 @@ public class Bot extends FieldObject implements Runnable {
             }
         }
         for (ScannerReading sr : readings) {
-            if(sr != null) {
+            if (sr != null) {
                 sr.draw(g);
             }
         }

@@ -49,15 +49,26 @@ public class Point {
         return Math.hypot(x - x1, y - x2);
     }
     
-    public void translate(double dx, double dy) {
+    public Point translate(double dx, double dy) {
         x += dx;
         y += dy;
+        return this;
+    }
+    
+    public Point translate(Vector v) {
+        return translate(v.i, v.j);
     }
     
     public void draw(Graphics g, double diam) {
         g.fillOval((int)(x - diam / 2), (int)(y - diam / 2), (int)diam, (int)diam);
     }
     
+    @Override
+    public Point clone() {
+        return new Point(x,y);
+    }
+    
+    @Override
     public String toString() {
         return "(" + x + ", " + y + ")"; 
     }

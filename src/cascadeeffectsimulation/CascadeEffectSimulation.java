@@ -1,4 +1,3 @@
-
 package cascadeeffectsimulation;
 
 import java.awt.Color;
@@ -8,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.ConcurrentModificationException;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JButton;
@@ -16,11 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
-
 /**
  * @author Drew
  */
-
 public class CascadeEffectSimulation extends JPanel implements MouseInputListener {
 
 // screen information
@@ -44,7 +42,7 @@ public class CascadeEffectSimulation extends JPanel implements MouseInputListene
             // Called when start button is pressed
         }
     };
-    
+
     public static void main(String[] args) {
         animation.addMouseListener(animation);
         animation.addMouseMotionListener(animation);
@@ -70,7 +68,7 @@ public class CascadeEffectSimulation extends JPanel implements MouseInputListene
                 f.setVisible(true);
             }
         });
-        
+
         animation.field.init();
 
         Timer timer = new Timer(true);
@@ -87,7 +85,10 @@ public class CascadeEffectSimulation extends JPanel implements MouseInputListene
     @Override
     public void paintComponent(Graphics g) {
         g.clearRect(0, 0, 12 * Field.pixelsPerFoot + 5, 12 * Field.pixelsPerFoot + 5);
-        animation.field.draw(g);
+        try {
+            animation.field.draw(g);
+        } catch (ConcurrentModificationException exc) {
+        }
     }
 
     //timing classes
@@ -98,7 +99,7 @@ public class CascadeEffectSimulation extends JPanel implements MouseInputListene
             animation.repaint();
         }
     }
-    
+
     static class runTiming extends TimerTask {
 
         @Override
@@ -111,23 +112,21 @@ public class CascadeEffectSimulation extends JPanel implements MouseInputListene
     @Override
     public void mousePressed(MouseEvent e) {
         java.awt.Point point = new java.awt.Point(e.getPoint());
-        
+
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         java.awt.Point point = new java.awt.Point(e.getPoint());
-        
+
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        
     }
 
     ///////////////////////////////////////////////////////////////////////////

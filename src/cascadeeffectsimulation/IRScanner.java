@@ -8,22 +8,26 @@ import java.util.TimerTask;
 
 /**
  * @author Drew
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+/**
  */
 public class IRScanner {
 
     public Bot bot;
-    private Point relativePos;
+    private Point posInBot;
     private Angle relativeAngle;
     private Angle[] relativeAngleRange;
     private double range = Field.pixelsPerFoot * 3;
     private static double degPerSecond = 80;
     private double reading;
-    private ScannerReading scannerReading = null;
     private int updateDelay = 35;
 
     public IRScanner(Bot bot, Point relativePos, Angle[] relativeAngleRange) {
         this.bot = bot;
-        this.relativePos = relativePos;
+        this.posInBot = relativePos;
         this.relativeAngle = new Angle(0);
         this.relativeAngleRange = relativeAngleRange;
         Timer timer = new Timer(true);
@@ -53,21 +57,49 @@ public class IRScanner {
             vectorShortened = true;
         }
         
-        if(scannerReading != null && vectorShortened) {
-            Vector relativeReadingVector = new Vector(readingVector.magnitude(), relativeAngle.add(bot.getRelativeAngle()));
-            scannerReading.add(relativeReadingVector);
+        if(vectorShortened) {
+            sendReading(readingVector);
         }
+        
         reading = readingVector.magnitude();
     }
     
-    public ScannerReading scan() {
+    public void startScan() {
+        class RunScan implements Runnable{
+            
+            IRScanner scanner;
+            
+            public RunScan(IRScanner scanner) {
+                this.scanner = scanner;
+            }
+            
+            public void start() {
+                Thread thread = new Thread(this);
+                thread.start();
+            }
+            
+            @Override
+            public void run() {
+                while(true) {
+                    scanner.scan();
+                }
+            }
+        }
+        
+        RunScan runScan = new RunScan(this);
+        runScan.start();
+        
+    }
+    
+    public void sendReading(Vector globalVector) { // vector with global references
+        Vector relativeReadingVector = new Vector(globalVector.magnitude(), relativeAngle.add(bot.getRelativeAngle()));
+        ScannerReading scannerReading = new ScannerReading(getRelativePos(), getActualPos(), this, relativeReadingVector);
+        bot.addReading(scannerReading);
+    }
+    
+    public void scan() {
         turnTo(relativeAngleRange[0]);
-        scannerReading = new ScannerReading(relativePos, getActualPos(), this);
         turnTo(relativeAngleRange[1]);
-        ScannerReading output = scannerReading.clone();
-        scannerReading = null;
-        turnTo(new Angle(0));
-        return output;
     }
 
     private boolean clearReading(Vector v) {
@@ -102,13 +134,21 @@ public class IRScanner {
 
     public Point getActualPos() {
         Point tl = bot.getFrontLeft();
-        double hypot = Math.hypot(relativePos.x, relativePos.y);
-        Angle theta = new Angle(Math.toDegrees(Math.atan2(relativePos.y, relativePos.x)));
+        double hypot = Math.hypot(posInBot.x, posInBot.y);
+        Angle theta = new Angle(Math.toDegrees(Math.atan2(posInBot.y, posInBot.x)));
         theta = theta.add(90).add(bot.getAngle());
         double x = tl.x + theta.cos() * hypot;
         double y = tl.y + theta.sin() * hypot;
 
         return new Point(x, y);
+    }
+    
+    public Point getRelativePos() {
+        Point relativeFrontLeft = bot.getRelativeFrontLeft();
+        Vector inBotDisp = new Vector(posInBot.x, posInBot.y);
+        Vector relativeDisp = inBotDisp.rotate(bot.getRelativeAngle());
+        Point relativePos = relativeFrontLeft.clone().translate(relativeDisp);
+        return relativePos;
     }
 
     public Angle getRelativeAngle() {
