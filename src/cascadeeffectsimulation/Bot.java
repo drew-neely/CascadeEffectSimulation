@@ -24,8 +24,10 @@ public class Bot extends FieldObject implements Runnable {
     public static double size = Field.pixelsPerFoot * 1.5;
     private Color color;
     private IRScanner[] scanners = new IRScanner[2];
-    private Point relativePos = new Point(0, 0);
-    private Angle relativeAngle = new Angle(0);
+    private Position relativePos = new Position(new Point(0,0), new Angle(0));
+//    private Point relativePos = new Point(0, 0);
+//    private Angle relativeAngle = new Angle(0);
+    private ArrayList<Position> path = new ArrayList<>();
     private ArrayList<ScannerReading> readings = new ArrayList<>();
 
     // Blue on bottom, Red on top
@@ -41,17 +43,21 @@ public class Bot extends FieldObject implements Runnable {
         scanners[1] = new IRScanner(this, new Point(size - 20, 20), new Angle[]{new Angle(-60), new Angle(120)});
         scanners[0].startScan();
         scanners[1].startScan();
+        makePath();
     }
 
     @Override
     public void run() {
-        moveFor(3, 3);
-        turnFor(new Angle(90), 45);
-        moveFor(3, 3);
-        turnFor(new Angle(-90), 45);
-        moveFor(1.5, 3);
-        turnFor(new Angle(-90), 45);
+        for(Position pos : path) {
+            goTo(pos);
+        }
         System.out.println("Simulation Complete");
+    }
+    
+    public void goTo(Position pos) {
+        turnFor(pos.rotationToPos(relativePos), 30);
+        moveFor(pos.distToPos(relativePos), 1);
+        turnFor(pos.rotationToOrient(relativePos), 30);
     }
 
     // turns the bot over a period of time
@@ -65,7 +71,7 @@ public class Bot extends FieldObject implements Runnable {
             //int mult = (angle.getDegrees() > 180 || angle.getDegrees() < 0)? -1 : 1;
             Angle turnAng = new Angle(dirSign * (degPerSecond * seconds) - angle.subtract(toTravel).getDegrees());
             rotate(turnAng);
-            relativeAngle = relativeAngle.add(turnAng);
+            relativePos.rotate(turnAng);
             toTravel = toTravel.subtract(turnAng);
             this.angle = this.angle.add(turnAng);
             try {
@@ -109,15 +115,24 @@ public class Bot extends FieldObject implements Runnable {
             double seconds = (double) (currentTime - startTime) / 1000;
             double moveDist = feetPerSecond * Field.pixelsPerFoot * seconds - distTraveled;
             Vector disp = new Vector(moveDist, angle);
-            Vector relativeDisp = new Vector(moveDist, relativeAngle);
+            Vector relativeDisp = new Vector(moveDist, relativePos.angle);
             translate(disp);
-            relativePos.translate(relativeDisp);
+            relativePos.translate(relativeDisp.multiply((double) 1 /Field.pixelsPerFoot));
             distTraveled += moveDist;
             try {
                 Thread.sleep(12l);
             } catch (InterruptedException ex) {
             }
         }
+    }
+    
+    public void makePath() {
+        Position p1 = new Position(new Point(2,1), new Angle(0));
+        Position p2 = new Position(new Point(2,-1), new Angle(0));
+        Position p3 = new Position(new Point(5,3), new Angle(0));
+        path.add(p1);
+        path.add(p2);
+        path.add(p3);
     }
 
     public void addReading(ScannerReading scannerReading) {
@@ -204,7 +219,11 @@ public class Bot extends FieldObject implements Runnable {
     }
 
     public Angle getRelativeAngle() {
-        return relativeAngle;
+        return relativePos.angle;
+    }
+    
+    public Position getRelativePos() {
+        return relativePos.clone();
     }
 
     public Field getField() {
@@ -223,15 +242,16 @@ public class Bot extends FieldObject implements Runnable {
     
     public Point getRelativeFrontLeft() {
         double hypot = (size / 2) * Math.sqrt(2);
-        Angle theta = relativeAngle.add(-45);
-        double x = relativePos.x + theta.cos() * hypot;
-        double y = relativePos.y + theta.sin() * hypot;
+        Angle theta = relativePos.angle.add(-45);
+        double x = relativePos.pos.x + theta.cos() * hypot;
+        double y = relativePos.pos.y + theta.sin() * hypot;
         
         return new Point(x, y);
     }
 
     @Override
     public void draw(Graphics g) {
+        System.out.println(relativePos);
         g.setColor(color);
         this.fillPolygon(g);
         Vector dir = new Vector(.75 * Field.pixelsPerFoot, angle);

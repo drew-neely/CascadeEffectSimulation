@@ -23,6 +23,22 @@ public class Angle {
         return Math.toRadians(deg);
     }
     
+    public Angle getStandard() {
+        return new Angle(standardAngle(deg));
+    }
+    
+    public Angle getNearestTo0() {
+        Angle std = getStandard();
+        Angle res;
+        if(std.getDegrees() <= 180) {
+            res = std;
+        }
+        else {
+            res = std.subtract(360);
+        }
+        return res;
+    }
+    
     public Angle add(Angle a) {
         return new Angle(this.deg + a.getDegrees());
     }
@@ -60,6 +76,6 @@ public class Angle {
     
     @Override
     public String toString() {
-        return deg + "°";
+        return ((double)((int)(deg * 1000)) / 1000) + "°";
     }
 }

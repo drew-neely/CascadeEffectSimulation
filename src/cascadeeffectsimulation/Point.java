@@ -64,6 +64,10 @@ public class Point {
         return translate(v.i, v.j);
     }
     
+    public Point divide(double d) {
+        return new Point(x / d, y / d);
+    }
+    
     public void draw(Graphics g, double diam) {
         g.fillOval((int)(x - diam / 2), (int)(y - diam / 2), (int)diam, (int)diam);
     }
@@ -75,6 +79,6 @@ public class Point {
     
     @Override
     public String toString() {
-        return "(" + x + ", " + y + ")"; 
+        return "(" + ((double)((int)(x * 1000)) / 1000) + ", " + ((double)((int)(y * 1000)) / 1000) + ")"; 
     }
 }

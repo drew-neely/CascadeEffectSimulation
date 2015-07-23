@@ -33,7 +33,7 @@ public class ScannerReading {
     }
     
     public void draw(Graphics g) {
-        relativeReading.rotate(scanner.bot.startAngle).endPoint(actualStart).draw(g, 10);
+        relativeReading.rotate(scanner.bot.startAngle).multiply(Field.pixelsPerFoot).endPoint(actualStart).draw(g, 10);
     }
     
 }

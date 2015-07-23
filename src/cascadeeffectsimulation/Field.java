@@ -41,7 +41,7 @@ public class Field {
     }
 
     public void init() {
-        bot = new Bot(this, Color.red, 1); // color and starting position of bot
+        bot = new Bot(this, Color.blue, 1); // color and starting position of bot
         allFieldObjects.add(FieldObject.centerGoal(2)); // this number is the position that the center goal is in
         try {
             Thread thread = new Thread(bot);

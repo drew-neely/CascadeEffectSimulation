@@ -92,7 +92,7 @@ public class IRScanner {
     }
     
     public void sendReading(Vector globalVector) { // vector with global references
-        Vector relativeReadingVector = new Vector(globalVector.magnitude(), relativeAngle.add(bot.getRelativeAngle()));
+        Vector relativeReadingVector = new Vector(globalVector.magnitude() / Field.pixelsPerFoot, relativeAngle.add(bot.getRelativeAngle()));
         ScannerReading scannerReading = new ScannerReading(getRelativePos(), getActualPos(), this, relativeReadingVector);
         bot.addReading(scannerReading);
     }
@@ -148,7 +148,7 @@ public class IRScanner {
         Vector inBotDisp = new Vector(posInBot.x, posInBot.y);
         Vector relativeDisp = inBotDisp.rotate(bot.getRelativeAngle());
         Point relativePos = relativeFrontLeft.clone().translate(relativeDisp);
-        return relativePos;
+        return relativePos.divide(Field.pixelsPerFoot);
     }
 
     public Angle getRelativeAngle() {
