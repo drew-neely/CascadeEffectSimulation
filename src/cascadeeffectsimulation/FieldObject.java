@@ -42,6 +42,10 @@ public class FieldObject extends Polygon {
     
     private Color color = Color.green;
     
+    public void setColor(Color color) {
+        this.color = color;
+    }
+    
     public FieldObject(Point... points) {
         super(getXs(points), getYs(points), points.length);
     }

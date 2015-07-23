@@ -65,6 +65,16 @@ public class Polygon {
     public Point getCenter() {
         return new Point(average(xpoints), average(ypoints));
     }
+    
+    public void makeCenter(Point p) {
+        Point center = getCenter();
+        double dx = p.x - center.x;
+        double dy = p.y - center.y;
+        for(int i = 0; i < npoints; i++) {
+            xpoints[i] += dx;
+            ypoints[i] += dy;
+        }
+    }
 
     private double average(double[] nums) {
         double sum = 0;

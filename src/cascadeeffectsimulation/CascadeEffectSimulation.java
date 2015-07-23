@@ -117,8 +117,8 @@ public class CascadeEffectSimulation extends JPanel implements MouseInputListene
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        java.awt.Point point = new java.awt.Point(e.getPoint());
-
+        Point point = new Point(e.getPoint());
+        animation.field.moveDragBot(point);
     }
 
     @Override
@@ -137,6 +137,8 @@ public class CascadeEffectSimulation extends JPanel implements MouseInputListene
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        Point point = new Point(e.getPoint());
+        animation.field.moveDragBot(point);
     }
 
     @Override

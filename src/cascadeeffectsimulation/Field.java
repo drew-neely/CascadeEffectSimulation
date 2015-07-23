@@ -14,6 +14,7 @@ public class Field {
     private Dimension size;
     private ArrayList<FieldObject> allFieldObjects = new ArrayList<>();
     private Bot bot;
+    private FieldObject dragBot;
 
     public Field(Dimension dim) {
         size = dim;
@@ -47,5 +48,14 @@ public class Field {
             thread.start();
         } catch (Exception e) {
         }
+        
+        Point[] points = {new Point(-200,-200), new Point(-200, -100), new Point(-100, -100), new Point(-100, -200)};
+        dragBot = new FieldObject(points);
+        dragBot.setColor(Color.orange);
+        allFieldObjects.add(dragBot);
+    }
+    
+    public void moveDragBot(Point p) {
+        dragBot.makeCenter(p);
     }
 }

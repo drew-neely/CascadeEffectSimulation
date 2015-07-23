@@ -22,6 +22,11 @@ public class Point {
         this.x = x;
         this.y = y;
     }
+    
+    public Point(java.awt.Point point) {
+        x = point.x;
+        y = point.y;
+    }
 
     public void setLocation(double x, double y) {
         this.x = x;
